@@ -32,13 +32,13 @@ mkNFTPolicy tn utxo _ ctx = traceIfFalse "UTxO not consumed"   hasUTxO          
 
 ```
 
-The minting policy of this type of NFT takes and validates as a parameter a specific UXTO and makes sure the UTXO is spent during the minting transaction. Because of this, all the NFTs we mint have a different policy ID. If you are pruchaing a Horrocube or one of our collectile cards from a another user and not directly from us, you should make sure it is an authentic Horrocube NFT. You can do this by going to our website www.horrocubes.io and using the verify function or you can directly validate if the NFT is valid by verifying its signature.
+The minting policy of this type of NFT takes and validates as a parameter a specific UXTO and makes sure the UTXO is spent during the minting transaction. Because of this, all the NFTs we mint have a different policy ID. If you are purchasing a Horrocube or one of our collectible cards from another user and not directly from us, you should ensure it is an authentic Horrocube NFT. You can do this by going to our website www.horrocubes.io and using the verify function, or you can directly validate if the NFT is valid by verifying its signature.
 
-We add a RsaSha256  signature to all our NFT, this tool will make the validation for you.
+We add a RsaSha256 signature to all our NFTs; this tool will make the validation for you.
 
-first you need to download the signature file of your NFT, this signature file is upload to the IPFS network when your NFT is minted, you can find the link to it in your NFT metadata under the filed "signatureLink".
+First, you need to download the signature file of your NFT; this signature file is upload to the IPFS network when your NFT is minted; you can find the link to it in your NFT metadata under the field "signatureLink".
 
-This is how the looks like:
+This is how the file looks like:
 
 ```json
 {
@@ -48,9 +48,9 @@ This is how the looks like:
 }
 ```
 
-NOTE: You can validate the signature by yourself using openssl for example. The "policyId" field is the payload and the signature field is the "signature". The signature is encoded as base64, so you must first decide it to make the validation.
+<b>Note</b>: You can validate the signature by yourself using OpenSSL, for example. The "policyId" field is the payload, and the "signature "field is the signature; the signature is encoded as base64, so you must first decide to make the validation.
 
-Once you donwload the file, you can run this tool as follows:
+Once you download the file, you can run this tool as follows:
 
 ```
 java -jar ./horrocubes-signature-validator-1.0.jar /tmp/QmTaDPC8dVHAY5N2MUVNfSY7ESzrQp1VHUjvBZ5ad6zP6v.json
@@ -79,7 +79,7 @@ gx2c72Fgh7ZhAgMBAAE=
 
 Download the per-compiled tool from:
 
-<a id="raw-url" href="https://github.com/AngelCastilloB/java-thunderbolt/releases/download/1.0-SNAPSHOT/thunderbolt_linux.tar.gz"> - Download Linux v1.0.SNAPSHOP</a>
+<a id="raw-url" href="https://github.com/Horrocubes/horrocubes-signature-validator/releases/download/v1.0/horrocubes-signature-validator-1.0.jar"> - Download v1.0</a>
 
 Build
 -----
