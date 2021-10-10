@@ -79,7 +79,7 @@ gx2c72Fgh7ZhAgMBAAE=
 
 Download the per-compiled tool from:
 
-<a id="raw-url" href="https://github.com/AngelCastilloB/java-thunderbolt/releases/download/1.0-SNAPSHOT/thunderbolt_linux.tar.gz"> - Download Linux v1.0.SNAPSHOP</a>
+<a id="raw-url" href="https://github.com/Horrocubes/horrocubes-signature-validator/releases/download/v1.0/horrocubes-signature-validator-1.0.jar"> - Download Linux v1.0.SNAPSHOP</a>
 
 Build
 -----
