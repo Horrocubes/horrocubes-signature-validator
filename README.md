@@ -34,26 +34,29 @@ mkNFTPolicy tn utxo _ ctx = traceIfFalse "UTxO not consumed"   hasUTxO          
 
 The minting policy of this type of NFT takes and validates as a parameter a specific UXTO and makes sure the UTXO is spent during the minting transaction. Because of this, all the NFTs we mint have a different policy ID. If you are purchasing a Horrocube or one of our collectible cards from another user and not directly from us, you should ensure it is an authentic Horrocube NFT. You can do this by going to our website www.horrocubes.io and using the verify function, or you can directly validate if the NFT is valid by verifying its signature.
 
-We add a RsaSha256 signature to all our NFTs; this tool will make the validation for you.
+We add a ECDSA secp256k1 signature to all our NFTs; this tool will make the validation for you.
 
-First, you need to download the signature file of your NFT; this signature file is upload to the IPFS network when your NFT is minted; you can find the link to it in your NFT metadata under the field "signatureLink".
+First, you need write down the policyId and the signature data of your NFT; you can get all requiered information from the NFT metadata; the signature information is under the field "signature".
 
-This is how the file looks like:
+This is how the node looks:
 
 ```json
 {
-  "securityAlgorithm": "RsaSha256",
-  "policyId": "6b5deb9b7dec1f5ffd80e25182072d43edc1a4be3c2f40ef36f20e56",
-  "signature": "b7DAVRaZBLr/PYZF+4tiA65uphjmDFHprL4vXHcDIOak8lJC5KCJhNTtQNI8La5iiRWgYkcsoydavwpJ/yv4hnDZEdyrPe5lN8xH0Ng3/LfrAw0wXV+/S0wrl/NaAwgnyHH5yWL9KUWDpG+qBB1gDRNWQrC4X1PEAjFx1/Tg2RVCoicGn77OjOsR9xjSvpobU/wJTncB385HOdeP08rneV23rvugAT6Q/zk46s/VkttAP/h35IIwGLWvmH/lTRJFgpsLxGhN5ZZ79hsGL8bRehWP8njMAXQnoDYjZQ7SffjLoCQ3pA73HPdze11fTJnVvWONI2wH9RMuEM+mxK2SR3A/Ny2sfgNGpz4CwQNhn4NJcJu7+7nKUVzv2CPLuXIh1mi+/F9a/AGRiIqW7kn65qdxD3MMH82L1C8633T1orlHmQunFEK2ZTKww3zgloC2IjxxRuU7PkUwEHTrzJhXY0iFsd+EYBPBcyJD6dyQl7FMEPu9xC5WTIyZgu4DXRJR"
+  "securityAlgorithm": "EcdsaSecp256k1Sha256",
+  "r": "OmH8/meLqEx4dNDKZqAMFpkUgoXPB63Sp/lnS1tSo5U=",
+  "s": "AP9UBXDYHiBKnFo49+nkTW1Hwutbe+iYGsWBDhggqL1i"
 }
 ```
 
-<b>Note</b>: You can validate the signature by yourself using OpenSSL, for example. The "policyId" field is the payload, and the "signature "field is the signature; the signature is encoded as base64, so you must first decide to make the validation.
-
-Once you download the file, you can run this tool as follows:
+Once you have the information, you can run this tool as follows:
 
 ```
-java -jar ./horrocubes-signature-validator-1.0.jar /tmp/QmTaDPC8dVHAY5N2MUVNfSY7ESzrQp1VHUjvBZ5ad6zP6v.json
+
+java -jar ./horrocubes-signature-validator-1.1.jar policyId r s
+
+i.e:
+
+java -jar ./horrocubes-signature-validator-1.1.jar "a1c6cefca22b4527acdf17a1d44674b6d7cf17c3e7e35cbd1a57d8b5" "OmH8/meLqEx4dNDKZqAMFpkUgoXPB63Sp/lnS1tSo5U=" "AP9UBXDYHiBKnFo49+nkTW1Hwutbe+iYGsWBDhggqL1i"
 ```
 
 ## Public Key
@@ -61,17 +64,7 @@ java -jar ./horrocubes-signature-validator-1.0.jar /tmp/QmTaDPC8dVHAY5N2MUVNfSY7
 This is the public key we use for verification.
 
 ```
------BEGIN RSA PUBLIC KEY-----
-MIIBigKCAYEA7jvXWc9M/81s+R7SVrgDkFuI5I0iYMNjuc7oUfOqZS+R8aKWduCR
-LwKoTv09Y5p+fg0uHOD/dQeLQz07hR0Gxj0q++5WEjgc8MZ9tkAfEXuYT4yHCS/V
-6h0qUri0bPspYBWh0z3rpD+LHJzCpX6a9POwaxZ1fCNS2+Wba5EarSdebe9G5Mo1
-XJhZjzCd5h9CgTceYc0GxIBUubmm6NHgESXLKV/hY/fzsqLbfmdym5HTqbsENeug
-zLaq06GKQdO8YwRxar9JS6flkxfKrpp/NiM1eS/oHvJoJwohDtxxcFpJtbWfB1po
-g7zeYeQg3PmBiQNMIWBbASPrMFVBK0sR1Y1bmucpkwM7jNDKhiKHq9MAgYs/ikr3
-zjD1xKPVHHkICdGuX0XjG0wdWxfTq11pGh+fH5oev+HsYvDwDAf3QdBP+gw4cWyW
-Q50zth6Bwc1xLLgKQZvtXytBIaUKUdPKTQ65nByhKOsvfMTpMQXMcx6r+I8F5b69
-gx2c72Fgh7ZhAgMBAAE=
------END RSA PUBLIC KEY-----
+03AF1C65E1D41082F21591A3BFA2A8398B08310BD5C3E7F981408292F35BC59694
 
 ```
 
@@ -79,7 +72,7 @@ gx2c72Fgh7ZhAgMBAAE=
 
 Download the per-compiled tool from:
 
-<a id="raw-url" href="https://github.com/Horrocubes/horrocubes-signature-validator/releases/download/v1.0/horrocubes-signature-validator-1.0.jar"> - Download v1.0</a>
+<a id="raw-url" href="https://github.com/Horrocubes/horrocubes-signature-validator/releases/download/v1.1/horrocubes-signature-validator-1.1.jar"> - Download v1.0</a>
 
 Build
 -----
