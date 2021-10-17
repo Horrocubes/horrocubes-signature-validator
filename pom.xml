@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.horrocubes</groupId>
 	<artifactId>horrocubes-signature-validator</artifactId>
-	<version>1.0</version>
+	<version>1.1</version>
 	<packaging>jar</packaging>
 	<name>horrocubes-signature-validator</name>
 	<description>Signature validator for Horrocube NFTs</description>
