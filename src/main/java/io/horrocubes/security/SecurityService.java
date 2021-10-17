@@ -18,16 +18,9 @@ package io.horrocubes.security;
 
 /* IMPORTS *******************************************************************/
 
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
-import org.bouncycastle.crypto.signers.RSADigestSigner;
-import org.bouncycastle.crypto.util.PublicKeyFactory;
-import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.util.encoders.Base64;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.math.BigInteger;
 
 /* IMPLEMENTATION ************************************************************/
 
@@ -36,77 +29,47 @@ import java.nio.charset.StandardCharsets;
  */
 public class SecurityService
 {
-    private final static String HORROCUBES_SIGNING_PUBLIC_KEY =
-            "-----BEGIN RSA PUBLIC KEY-----\n" +
-            "MIIBigKCAYEA7jvXWc9M/81s+R7SVrgDkFuI5I0iYMNjuc7oUfOqZS+R8aKWduCR\n" +
-            "LwKoTv09Y5p+fg0uHOD/dQeLQz07hR0Gxj0q++5WEjgc8MZ9tkAfEXuYT4yHCS/V\n" +
-            "6h0qUri0bPspYBWh0z3rpD+LHJzCpX6a9POwaxZ1fCNS2+Wba5EarSdebe9G5Mo1\n" +
-            "XJhZjzCd5h9CgTceYc0GxIBUubmm6NHgESXLKV/hY/fzsqLbfmdym5HTqbsENeug\n" +
-            "zLaq06GKQdO8YwRxar9JS6flkxfKrpp/NiM1eS/oHvJoJwohDtxxcFpJtbWfB1po\n" +
-            "g7zeYeQg3PmBiQNMIWBbASPrMFVBK0sR1Y1bmucpkwM7jNDKhiKHq9MAgYs/ikr3\n" +
-            "zjD1xKPVHHkICdGuX0XjG0wdWxfTq11pGh+fH5oev+HsYvDwDAf3QdBP+gw4cWyW\n" +
-            "Q50zth6Bwc1xLLgKQZvtXytBIaUKUdPKTQ65nByhKOsvfMTpMQXMcx6r+I8F5b69\n" +
-            "gx2c72Fgh7ZhAgMBAAE=\n" +
-            "-----END RSA PUBLIC KEY-----";
-
-    private static AsymmetricKeyParameter s_publicKey = null;
-
-    // Initialize s_publicKey
-    static
-    {
-        try
-        {
-            s_publicKey = PublicKeyFactory.createKey((SubjectPublicKeyInfo) readPemObject());
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
+    private static final byte[] s_publicKey =
+            hexStringToByteArray("03AF1C65E1D41082F21591A3BFA2A8398B08310BD5C3E7F981408292F35BC59694");
 
     /**
      * Verify the given signature in base64.
      *
-     * @param base64Signature The signature.
      * @param message The message to be signed.
+     * @param base64SignatureR The R component of the signature.
+     * @param base64SignatureS The S component of the signature.
      *
      * @return True if the signature is valid; otherwise; false.
      */
-    public static boolean verify(String base64Signature, String message)
+    public static boolean verify(String message, String base64SignatureR, String base64SignatureS)
     {
         byte[] messageBytes = message.getBytes();
-        byte[] signature =  Base64.decode(base64Signature);
+        BigInteger[] signature = new BigInteger[2];
 
-        RSADigestSigner signer = new RSADigestSigner(new SHA256Digest());
-        signer.init(false, s_publicKey);
-        signer.update(messageBytes, 0, messageBytes.length);
+        signature[0] = new BigInteger(Base64.decode(base64SignatureR));
+        signature[1] = new BigInteger(Base64.decode(base64SignatureS));
 
-        return signer.verifySignature(signature);
+        return EllipticCurveProvider.verify(messageBytes, signature, s_publicKey);
     }
 
     /**
-     * Reads a PEM object.
+     * Parse the hex string and returns a byte array.
      *
-     * @return The PEM object.
+     * @param content the string to parse.
+     *
+     * @return The byte array.
      */
-    private static Object readPemObject()
+    public static byte[] hexStringToByteArray(String content)
     {
-        try
+        int len = content.length();
+
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2)
         {
-            InputStream       is        = new ByteArrayInputStream(HORROCUBES_SIGNING_PUBLIC_KEY.getBytes(StandardCharsets.UTF_8));
-            InputStreamReader isr       = new InputStreamReader(is, StandardCharsets.UTF_8);
-            PEMParser         pemParser = new PEMParser(isr);
-
-            Object obj = pemParser.readObject();
-
-            if (obj == null)
-                throw new Exception("No PEM object found");
-
-            return obj;
+            data[i / 2] = (byte) ((Character.digit(content.charAt(i), 16) << 4)
+                    + Character.digit(content.charAt(i+1), 16));
         }
-        catch (Throwable ex)
-        {
-            throw new RuntimeException("Cannot read PEM object from input data", ex);
-        }
+
+        return data;
     }
 }

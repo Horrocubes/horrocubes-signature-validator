@@ -18,12 +18,7 @@ package io.horrocubes;
 
 /* IMPORTS *******************************************************************/
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.horrocubes.security.SecurityService;
-import io.horrocubes.security.SignatureAttributes;
-
-import java.nio.file.Paths;
-import java.util.Map;
 
 /* IMPLEMENTATION ************************************************************/
 
@@ -39,53 +34,21 @@ public class Main
 	 */
 	public static void main(String[] args)
 	{
-		if (args.length != 1)
+		if (args.length != 3)
 		{
-			System.out.println("USAGE: java -jar horrocubes-signature-validator-1.0 SIGNATURE_FILE");
+			System.out.println("USAGE: java -jar horrocubes-signature-validator-1.0 policyId R S");
 			return;
 		}
 
-		SignatureAttributes attributes = parseSignatureFile(args[0]);
-
-		boolean verified = SecurityService.verify(attributes.signature, attributes.policyId);
+		boolean verified = SecurityService.verify(args[0], args[1], args[2]);
 
 		if (verified)
 		{
-			System.out.printf("The signature is VALID for the NFT with the policy ID: \n - %s.\n", attributes.policyId);
+			System.out.printf("The signature is VALID for the NFT with the policy ID: \n - %s.\n", args[0]);
 		}
 		else
 		{
 			System.out.println("The signature is invalid.");
 		}
-	}
-
-	/**
-	 * Deserializes the signature file.
-	 *
-	 * @param path Path to the signature file.
-	 *
-	 * @return The signature attributes.
-	 */
-	private static SignatureAttributes parseSignatureFile(String path)
-	{
-		SignatureAttributes attributes = new SignatureAttributes();
-
-		try
-		{
-			ObjectMapper mapper = new ObjectMapper();
-
-			Map<?, ?> map = mapper.readValue(Paths.get(path).toFile(), Map.class);
-
-			attributes.securityAlgorithm = (String)map.get("securityAlgorithm");
-			attributes.policyId          = (String)map.get("policyId");
-			attributes.signature         = (String)map.get("signature");
-		}
-		catch (Exception ex)
-		{
-			ex.printStackTrace();
-			System.out.println("Invalid signature file.");
-		}
-
-		return attributes;
 	}
 }
